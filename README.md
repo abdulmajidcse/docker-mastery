@@ -28,20 +28,20 @@ This lesson is designed to provide both conceptual understanding and hands-on ex
   ```bash
   docker image ls
   docker container ls
-  docker container ls -a // non-active containers included
+  docker container ls -a # non-active containers included
   ```
 
 - Delete an image.
 
   ```bash
   docker rmi image_id_or_name
-  docker image prune // Remove unused images
+  docker image prune # Remove unused images
   ```
 
 - Delete a container.
   ```bash
   docker rm container_id_or_name
-  docker container prune // Remove all stopped containers
+  docker container prune # Remove all stopped containers
   ```
 
 ### Run JavaScript with Docker image
@@ -69,30 +69,30 @@ This lesson is designed to provide both conceptual understanding and hands-on ex
   docker run --rm -it -w /app -v "$(pwd):/app" node:24 bash
   ```
 
-  - `-it` = `-i` (Keep STDIN open even if not attached) and `-t` (Allocate a pseudo-TTY). Here we use `-it` to start a terminal.
+  - `-it` = `-i` (Keep STDIN open even if not attached) and `-t` (Allocate a pseudo-TTY).
 
 ### Setup Expressjs with Docker image
 
 ```bash
-// init package.json
+# init package.json
 docker run --rm -it --name express_app -w /app -v "$(pwd):/app" -u "$(id -u):$(id -g)" node:24 npm init -y
 
-// install expressjs
+# install expressjs
 docker run --rm -it --name express_app -w /app -v "$(pwd):/app" -u "$(id -u):$(id -g)" node:24 npm install express
 
-// install nodemon
+# install nodemon
 docker run --rm -it --name express_app -w /app -v "$(pwd):/app" -u "$(id -u):$(id -g)" node:24 npm i nodemon
 
-// start development server but it will not auto-remove container here
+# start development server but it will not auto-remove container here
 docker run --name express_app -w /app -v "$(pwd):/app" -u "$(id -u):$(id -g)" -p 3000:3000 node:24 npm run dev
 
-// you may stop development server via stopping container
+# you may stop development server (Stop a container)
 docker stop express_app
 
-// you may again start development server via starting container
+# you may again start development server (Start a container)
 docker start express_app
 ```
 
   - `--name express_app` = Specify a container name
   - `-u "$(id -u):$(id -g)"` = Specify a user which will get read, write and execute permission inside container
-
+  - `-p 3000:3000` = Publish a container's port(s) to the host
