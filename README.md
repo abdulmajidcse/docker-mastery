@@ -91,6 +91,9 @@ docker stop express_app
 
 # you may again start development server (Start a container)
 docker start express_app
+
+# you may open a terminal inside a container
+docker exec -it express_app bash
 ```
 
   - `--name express_app` = Specify a container name
