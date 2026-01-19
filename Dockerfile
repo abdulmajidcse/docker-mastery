@@ -1,0 +1,12 @@
+FROM node:24
+
+ARG USERID=1000
+ARG USERGROUP=1000
+
+USER ${USERID}:${USERGROUP}
+
+WORKDIR /app
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "dev" ]
