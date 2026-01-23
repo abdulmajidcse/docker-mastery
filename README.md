@@ -1,8 +1,8 @@
-## Docker Mastery: Lesson 04
+## Docker Mastery: Lesson 05
 
-### Connecting Multiple Containers (Express + MySQL)
+### Express and MySQL with Docker Compose
 
-In this lesson, you will learn how multiple Docker containers communicate with each other using a shared Docker network. We will connect an **Express application** container with a **MySQL** container.
+In this lesson, you will learn how multiple Docker containers communicate with each other using a shared Docker network. We will connect an Express.js application container with a MySQL database container using Docker Compose.
 
 ---
 
@@ -21,31 +21,16 @@ Instead, they communicate through a **Docker network** using **container names a
 ```bash
 cp .env.example .env
 
-docker run --name express_mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d mysql
-# or
-docker run --name express_mysql --env-file .env -p 3306:3306 -d mysql
-
 docker run --rm -it -v "$(pwd):/app" node24_dev:latest npm install
-
-docker run --name express_app -v "$(pwd):/app" -p 3000:3000 -d node24_dev:latest
 ```
 
-## Docker Network Setup
+## Run application with Docker Compose
 
 ```bash
-docker network create express_net
+docker compose up -d # start your application
 
-docker network connect express_net express_app
-docker network connect express_net express_mysql
-```
-
-## See Network Information
-
-```bash
-docker network ls
-
-docker container inspect express_app
-docker container inspect express_mysql
+docker compose down # remove containers, networks (stop application)
+docker compose down -v # remove containers, networks, and volume
 ```
 
 ## CREATE DATABASE and TABLE, then INSERT sample data
