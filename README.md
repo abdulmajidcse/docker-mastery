@@ -1,26 +1,88 @@
-## Docker Mastery: Lesson 03
+## Docker Mastery: Lesson 04
 
-In this lesson, we focus on building our own custom Docker image using a Dockerfile. This is a critical step in real-world Docker usage, where applications are packaged with their dependencies in a repeatable and portable way.
+### Connecting Multiple Containers (Express + MySQL)
 
-You will learn how Docker images are constructed layer by layer, how each instruction in a Dockerfile works, and how to turn your application source code into a runnable container image.
+In this lesson, you will learn how multiple Docker containers communicate with each other using a shared Docker network. We will connect an **Express application** container with a **MySQL** container.
 
-### Build Your Custom Docker Image and Run Application
+---
+
+## Key Concept
+
+Docker containers **do not communicate using `localhost`**.  
+Instead, they communicate through a **Docker network** using **container names as hostnames**.
+
+> ✅ Containers must be on the same Docker network  
+> ✅ Use the container name as the database host
+
+---
+
+## Setup Instructions
 
 ```bash
-docker build -t node24_dev . # Build an image
-docker build --build-arg USERID=$(id -u) --build-arg USERGROUP=$(id -g) -t node24_dev . # Build an image with specify user
+cp .env.example .env
 
-docker run --rm -it -v "$(pwd):/app" node24_dev:latest npm install # Install dependencies if you need
+docker run --name express_mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d mysql
+# or
+docker run --name express_mysql --env-file .env -p 3306:3306 -d mysql
 
-docker run --name express_app -v "$(pwd):/app" -p 3000:3000 node24_dev:latest # Run your container and start your application development
-docker run --name express_app -v "$(pwd):/app" -p 3000:3000 -d node24_dev:latest # Run your container with detach mode and start your application development
+docker run --rm -it -v "$(pwd):/app" node24_dev:latest npm install
+
+docker run --name express_app -v "$(pwd):/app" -p 3000:3000 -d node24_dev:latest
 ```
 
-### Other Commands
+## Docker Network Setup
 
 ```bash
-docker container logs express_app # See a container logs
-docker container inspect express_app # Inspect your container
-docker container port express_app # check ports in a container
-docker exec -it express_app bash # start a bash terminal using a running container
+docker network create express_net
+
+docker network connect express_net express_app
+docker network connect express_net express_mysql
+```
+
+## See Network Information
+
+```bash
+docker network ls
+
+docker container inspect express_app
+docker container inspect express_mysql
+```
+
+## CREATE DATABASE and TABLE, then INSERT sample data
+
+```bash
+# Access the MySQL container
+docker exec -it express_mysql bash
+
+# Log in to MySQL as root user
+mysql -u root -p
+# Enter password
+```
+
+```sql
+CREATE DATABASE docker_mastery;
+
+USE docker_mastery;
+
+CREATE TABLE IF NOT EXISTS posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL
+);
+
+INSERT INTO posts (title, content) VALUES
+('First Post', 'This is the content of the first post.'),
+('Second Post', 'This is the content of the second post.');
+```
+
+## Verify the inserted data
+
+```sql
+SELECT * FROM posts;
+```
+
+## Exit MySQL and the container
+
+```bash
+exit;
 ```
